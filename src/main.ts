@@ -14,16 +14,9 @@ async function bootstrap() {
     .setVersion('1.0.0')
     .build();
 
-  const swaggerDocument = SwaggerModule.createDocument(
-    app,
-    swaggerConfig,
-  );
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
 
-  SwaggerModule.setup(
-    'api/docs',
-    app,
-    swaggerDocument,
-  );
+  SwaggerModule.setup('api/docs', app, swaggerDocument);
 
   await app.listen(process.env.PORT ?? 3000);
 }

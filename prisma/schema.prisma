@@ -11,3 +11,22 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Category {
+  id String @id @default(uuid())
+
+  name String @unique
+
+  slug String? @unique
+
+  description String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  @@index([name])
+  @@map("categories")
+}

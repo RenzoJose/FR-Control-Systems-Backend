@@ -31,3 +31,26 @@ model Category {
   @@index([name])
   @@map("categories")
 }
+
+model Supplier {                                                                                                                                                 
+  id String @id @default(uuid())                                                                                                                                 
+                                                                                                                                                                
+  name String @unique                                                                                                                                            
+                                                                                                                                                                
+  contactName String?                                                                                                                                            
+                                                                                                                                                                
+  phone String?                                                                                                                                                  
+                                                                                                                                                                
+  email String?                                                                                                                                                  
+                                                                                                                                                                
+  notes String?                                                                                                                                                  
+                                                                                                                                                                
+  createdAt DateTime @default(now())                                                                                                                             
+                                                                                                                                                                
+  updatedAt DateTime @updatedAt                                                                                                                                  
+                                                                                                                                                                
+  deletedAt DateTime?                                                                                                                                            
+                                                                                                                                                               
+  @@index([name])                                                                                                                                                
+  @@map("suppliers")                                                                                                                                             
+}

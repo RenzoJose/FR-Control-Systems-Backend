@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { envValidationSchema } from './config';
 import { PrismaModule } from './infrastructure/database/prisma/prisma.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { SuppliersModule } from './modules/suppliers/suppliers.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
     }),
     PrismaModule,
     CategoriesModule,
+    SuppliersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

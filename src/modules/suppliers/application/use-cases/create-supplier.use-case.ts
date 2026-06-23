@@ -7,21 +7,21 @@ import { SUPPLIER_REPOSITORY } from '../../domain/repositories/supplier.reposito
 
 @Injectable()
 export class CreateSupplierUseCase {
-    constructor(
-        @Inject(SUPPLIER_REPOSITORY)
-        private readonly supplierRepository: SupplierRepository,
-    ) { }
+  constructor(
+    @Inject(SUPPLIER_REPOSITORY)
+    private readonly supplierRepository: SupplierRepository,
+  ) {}
 
-    async execute(dto: CreateSupplierDto): Promise<Supplier> {
-        const supplier = new Supplier(
-            randomUUID(),
-            dto.name,
-            dto.contactName,
-            dto.phone,
-            dto.email,
-            dto.notes,
-        );
+  async execute(dto: CreateSupplierDto): Promise<Supplier> {
+    const supplier = new Supplier(
+      randomUUID(),
+      dto.name,
+      dto.contactName,
+      dto.phone,
+      dto.email,
+      dto.notes,
+    );
 
-        return this.supplierRepository.create(supplier);
-    }
-}          
+    return this.supplierRepository.create(supplier);
+  }
+}

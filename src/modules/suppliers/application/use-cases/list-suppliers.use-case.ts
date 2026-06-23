@@ -6,12 +6,12 @@ import { SUPPLIER_REPOSITORY } from '../../domain/repositories/supplier.reposito
 
 @Injectable()
 export class ListSuppliersUseCase {
-    constructor(
-        @Inject(SUPPLIER_REPOSITORY)
-        private readonly supplierRepository: SupplierRepository,
-    ) { }
+  constructor(
+    @Inject(SUPPLIER_REPOSITORY)
+    private readonly supplierRepository: SupplierRepository,
+  ) {}
 
-    async execute(): Promise<Supplier[]> {
-        return this.supplierRepository.findAll();
-    }
-}          
+  async execute(): Promise<Supplier[]> {
+    return this.supplierRepository.findAll();
+  }
+}

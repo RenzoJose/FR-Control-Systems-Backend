@@ -28,29 +28,61 @@ model Category {
 
   deletedAt DateTime?
 
+  products Product[]
+
   @@index([name])
   @@map("categories")
 }
 
-model Supplier {                                                                                                                                                 
-  id String @id @default(uuid())                                                                                                                                 
-                                                                                                                                                                
-  name String @unique                                                                                                                                            
-                                                                                                                                                                
-  contactName String?                                                                                                                                            
-                                                                                                                                                                
-  phone String?                                                                                                                                                  
-                                                                                                                                                                
-  email String?                                                                                                                                                  
-                                                                                                                                                                
-  notes String?                                                                                                                                                  
-                                                                                                                                                                
-  createdAt DateTime @default(now())                                                                                                                             
-                                                                                                                                                                
-  updatedAt DateTime @updatedAt                                                                                                                                  
-                                                                                                                                                                
-  deletedAt DateTime?                                                                                                                                            
-                                                                                                                                                               
-  @@index([name])                                                                                                                                                
-  @@map("suppliers")                                                                                                                                             
+model Supplier {
+  id String @id @default(uuid())
+
+  name String @unique
+
+  contactName String?
+
+  phone String?
+
+  email String?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  products Product[]
+
+  @@index([name])
+  @@map("suppliers")
+}
+
+model Product {
+  id String @id @default(uuid())
+
+  sku String @unique
+
+  name String
+
+  brand String?
+
+  categoryId String
+  supplierId String
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  category Category @relation(fields: [categoryId], references: [id])
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  @@index([sku])
+  @@index([name])
+  @@index([categoryId])
+  @@index([supplierId])
+  @@map("products")
 }

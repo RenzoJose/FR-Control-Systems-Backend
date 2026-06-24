@@ -1,13 +1,13 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpCode,
-    HttpStatus,
-    Param,
-    Patch,
-    Post,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -22,57 +22,69 @@ import { UpdateSupplierUseCase } from '../../application/use-cases/update-suppli
 @ApiTags('Suppliers')
 @Controller('api/v1/suppliers')
 export class SuppliersController {
-    constructor(
-        private readonly createSupplierUseCase: CreateSupplierUseCase,
-        private readonly listSuppliersUseCase: ListSuppliersUseCase,
-        private readonly getSupplierUseCase: GetSupplierUseCase,
-        private readonly updateSupplierUseCase: UpdateSupplierUseCase,
-        private readonly deactivateSupplierUseCase: DeactivateSupplierUseCase,
-    ) { }
+  constructor(
+    private readonly createSupplierUseCase: CreateSupplierUseCase,
+    private readonly listSuppliersUseCase: ListSuppliersUseCase,
+    private readonly getSupplierUseCase: GetSupplierUseCase,
+    private readonly updateSupplierUseCase: UpdateSupplierUseCase,
+    private readonly deactivateSupplierUseCase: DeactivateSupplierUseCase,
+  ) {}
 
-    @Post()
-    @ApiOperation({ summary: 'Create supplier' })
-    @ApiResponse({ status: HttpStatus.CREATED, description: 'Supplier created' })
-    async create(@Body() dto: CreateSupplierDto) {
-        const supplier = await this.createSupplierUseCase.execute(dto);
+  @Post()
+  @ApiOperation({ summary: 'Create supplier' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Supplier created' })
+  async create(@Body() dto: CreateSupplierDto) {
+    const supplier = await this.createSupplierUseCase.execute(dto);
 
-        return { data: { id: supplier.id } };
-    }
+    return { data: { id: supplier.id } };
+  }
 
-    @Get()
-    @ApiOperation({ summary: 'List suppliers' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Suppliers listed' })
-    async findAll() {
-        const suppliers = await this.listSuppliersUseCase.execute();
+  @Get()
+  @ApiOperation({ summary: 'List suppliers' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Suppliers listed' })
+  async findAll() {
+    const suppliers = await this.listSuppliersUseCase.execute();
 
-        return { data: suppliers };
-    }
+    return { data: suppliers };
+  }
 
-    @Get(':id')
-    @ApiOperation({ summary: 'Get supplier' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Supplier found' })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Supplier not found' })
-    async findById(@Param('id') id: string) {
-        const supplier = await this.getSupplierUseCase.execute(id);
+  @Get(':id')
+  @ApiOperation({ summary: 'Get supplier' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Supplier found' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Supplier not found',
+  })
+  async findById(@Param('id') id: string) {
+    const supplier = await this.getSupplierUseCase.execute(id);
 
-        return { data: supplier };
-    }
+    return { data: supplier };
+  }
 
-    @Patch(':id')
-    @ApiOperation({ summary: 'Update supplier' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Supplier updated' })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Supplier not found' })
-    async update(@Param('id') id: string, @Body() dto: UpdateSupplierDto) {
-        const supplier = await this.updateSupplierUseCase.execute(id, dto);
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update supplier' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Supplier updated' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Supplier not found',
+  })
+  async update(@Param('id') id: string, @Body() dto: UpdateSupplierDto) {
+    const supplier = await this.updateSupplierUseCase.execute(id, dto);
 
-        return { data: supplier };
-    }
-    @Delete(':id')
-    @HttpCode(HttpStatus.NO_CONTENT)
-    @ApiOperation({ summary: 'Deactivate supplier' })
-    @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Supplier deactivated' })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Supplier not found' })
-    async deactivate(@Param('id') id: string) {
-        await this.deactivateSupplierUseCase.execute(id);
-    }
-}   
+    return { data: supplier };
+  }
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Deactivate supplier' })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Supplier deactivated',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Supplier not found',
+  })
+  async deactivate(@Param('id') id: string) {
+    await this.deactivateSupplierUseCase.execute(id);
+  }
+}

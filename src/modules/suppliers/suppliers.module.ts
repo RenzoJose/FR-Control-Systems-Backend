@@ -9,19 +9,18 @@ import { PrismaSupplierRepository } from './infrastructure/repositories/prisma-s
 import { SuppliersController } from './presentation/controllers/suppliers.controller';
 
 @Module({
-    controllers: [SuppliersController],
-    providers: [
-        {
-
-            provide: SUPPLIER_REPOSITORY,
-            useClass: PrismaSupplierRepository,
-        },
-        CreateSupplierUseCase,
-        DeactivateSupplierUseCase,
-        GetSupplierUseCase,
-        ListSuppliersUseCase,
-        UpdateSupplierUseCase,
-    ],
-    exports: [SUPPLIER_REPOSITORY],
+  controllers: [SuppliersController],
+  providers: [
+    {
+      provide: SUPPLIER_REPOSITORY,
+      useClass: PrismaSupplierRepository,
+    },
+    CreateSupplierUseCase,
+    DeactivateSupplierUseCase,
+    GetSupplierUseCase,
+    ListSuppliersUseCase,
+    UpdateSupplierUseCase,
+  ],
+  exports: [SUPPLIER_REPOSITORY],
 })
-export class SuppliersModule { }
+export class SuppliersModule {}

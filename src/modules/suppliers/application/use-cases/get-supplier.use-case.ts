@@ -6,21 +6,21 @@ import { SUPPLIER_REPOSITORY } from '../../domain/repositories/supplier.reposito
 
 @Injectable()
 export class GetSupplierUseCase {
-    constructor(
-        @Inject(SUPPLIER_REPOSITORY)
-        private readonly supplierRepository: SupplierRepository,
-    ) { }
+  constructor(
+    @Inject(SUPPLIER_REPOSITORY)
+    private readonly supplierRepository: SupplierRepository,
+  ) {}
 
-    async execute(id: string): Promise<Supplier> {
-        const supplier = await this.supplierRepository.findById(id);
+  async execute(id: string): Promise<Supplier> {
+    const supplier = await this.supplierRepository.findById(id);
 
-        if (!supplier) {
-            throw new NotFoundException({
-                code: 'SUPPLIER_NOT_FOUND',
-                message: 'Supplier not found',
-            });
-        }
-
-        return supplier;
+    if (!supplier) {
+      throw new NotFoundException({
+        code: 'SUPPLIER_NOT_FOUND',
+        message: 'Supplier not found',
+      });
     }
-} 
+
+    return supplier;
+  }
+}

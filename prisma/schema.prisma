@@ -4,10 +4,85 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Category {
+  id String @id @default(uuid())
+
+  name String @unique
+
+  slug String? @unique
+
+  description String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  products Product[]
+
+  @@index([name])
+  @@map("categories")
+}
+
+model Supplier {
+  id String @id @default(uuid())
+
+  name String @unique
+
+  contactName String?
+
+  phone String?
+
+  email String?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  products Product[]
+
+  @@index([name])
+  @@map("suppliers")
+}
+
+model Product {
+  id String @id @default(uuid())
+
+  sku String @unique
+
+  name String
+
+  brand String?
+
+  categoryId String
+  supplierId String
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  deletedAt DateTime?
+
+  category Category @relation(fields: [categoryId], references: [id])
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  @@index([sku])
+  @@index([name])
+  @@index([categoryId])
+  @@index([supplierId])
+  @@map("products")
 }

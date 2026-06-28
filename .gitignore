@@ -56,3 +56,12 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /generated/prisma
+
+# documentation
+docs
+1. Control PRD.md
+2. Control Technical Design Document.md
+3. Control Database Design.md
+4. Control Backend Structure.md
+5. Control Prisma Schema Specification.md
+6. FR Control API Specification.md

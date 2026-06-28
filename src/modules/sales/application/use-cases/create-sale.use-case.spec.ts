@@ -2,11 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CreateSaleUseCase } from './create-sale.use-case';
 import { SALE_REPOSITORY } from '../../domain/repositories/sale.repository.token';
 import type { SaleRepository } from '../../domain/repositories/sale.repository';
+import { PROFITABILITY_REPOSITORY } from '../../../profitability/domain/repositories/profitability.repository.token';
+import type { ProfitabilityRepository } from '../../../profitability/domain/repositories/profitability.repository';
+import { ProfitCalculatorService } from '../../../profitability/domain/services/profit-calculator.service';
 import { CreateSaleDto } from '../dto/create-sale.dto';
 
 describe('CreateSaleUseCase', () => {
   let useCase: CreateSaleUseCase;
   let saleRepository: jest.Mocked<SaleRepository>;
+  let profitabilityRepository: jest.Mocked<ProfitabilityRepository>;
 
   beforeEach(async () => {
     saleRepository = {
@@ -15,12 +19,22 @@ describe('CreateSaleUseCase', () => {
       findById: jest.fn(),
     };
 
+    profitabilityRepository = {
+      findBySaleId: jest.fn(),
+      upsert: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CreateSaleUseCase,
+        ProfitCalculatorService,
         {
           provide: SALE_REPOSITORY,
           useValue: saleRepository,
+        },
+        {
+          provide: PROFITABILITY_REPOSITORY,
+          useValue: profitabilityRepository,
         },
       ],
     }).compile();
@@ -28,7 +42,7 @@ describe('CreateSaleUseCase', () => {
     useCase = module.get<CreateSaleUseCase>(CreateSaleUseCase);
   });
 
-  it('should create a sale with items and costs', async () => {
+  it('should create a sale and auto-generate profitability snapshot', async () => {
     const dto: CreateSaleDto = {
       saleChannel: 'FALABELLA',
       saleDate: '2026-06-10',
@@ -63,17 +77,21 @@ describe('CreateSaleUseCase', () => {
       costs: [],
     });
 
+    profitabilityRepository.upsert.mockResolvedValue({} as never);
+
     const result = await useCase.execute(dto);
 
     expect(result.id).toBe('new-sale-id');
-    expect(saleRepository.create).toHaveBeenCalledWith(
+    expect(saleRepository.create).toHaveBeenCalled();
+    expect(profitabilityRepository.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
-        saleChannel: 'FALABELLA',
+        saleId: expect.any(String),
+        revenueNet: expect.any(Number),
       }),
     );
   });
 
-  it('should create a sale without costs', async () => {
+  it('should create a sale without costs and generate snapshot', async () => {
     const dto: CreateSaleDto = {
       saleChannel: 'DIRECT',
       saleDate: '2026-06-10',
@@ -98,9 +116,11 @@ describe('CreateSaleUseCase', () => {
       costs: [],
     });
 
+    profitabilityRepository.upsert.mockResolvedValue({} as never);
+
     const result = await useCase.execute(dto);
 
     expect(result.id).toBe('new-sale-id');
-    expect(saleRepository.create).toHaveBeenCalled();
+    expect(profitabilityRepository.upsert).toHaveBeenCalled();
   });
 });

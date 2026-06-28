@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ProfitCalculatorService } from './domain/services/profit-calculator.service';
 import { GetSaleProfitabilityUseCase } from './application/use-cases/get-sale-profitability.use-case';
 import { RecalculateProfitabilityUseCase } from './application/use-cases/recalculate-profitability.use-case';
@@ -8,7 +8,7 @@ import { ProfitabilityController } from './presentation/controllers/profitabilit
 import { SalesModule } from '../sales/sales.module';
 
 @Module({
-  imports: [SalesModule],
+  imports: [forwardRef(() => SalesModule)],
   controllers: [ProfitabilityController],
   providers: [
     ProfitCalculatorService,

@@ -6,12 +6,19 @@ import { SaleCost } from '../../domain/entities/sale-cost.entity';
 import type { SaleRepository } from '../../domain/repositories/sale.repository';
 import { SALE_REPOSITORY } from '../../domain/repositories/sale.repository.token';
 import { CreateSaleDto } from '../dto/create-sale.dto';
+import { ProfitCalculatorService } from '../../../profitability/domain/services/profit-calculator.service';
+import { PROFITABILITY_REPOSITORY } from '../../../profitability/domain/repositories/profitability.repository.token';
+import type { ProfitabilityRepository } from '../../../profitability/domain/repositories/profitability.repository';
+import { ProfitSnapshot } from '../../../profitability/domain/entities/profit-snapshot.entity';
 
 @Injectable()
 export class CreateSaleUseCase {
   constructor(
     @Inject(SALE_REPOSITORY)
     private readonly saleRepository: SaleRepository,
+    private readonly profitCalculator: ProfitCalculatorService,
+    @Inject(PROFITABILITY_REPOSITORY)
+    private readonly profitabilityRepository: ProfitabilityRepository,
   ) {}
 
   async execute(dto: CreateSaleDto): Promise<Sale> {
@@ -59,6 +66,21 @@ export class CreateSaleUseCase {
       costs,
     );
 
-    return this.saleRepository.create(sale);
+    const created = await this.saleRepository.create(sale);
+
+    const calculation = this.profitCalculator.calculate(items, costs);
+
+    const snapshot = new ProfitSnapshot(
+      saleId,
+      calculation.revenueNet,
+      calculation.totalCostNet,
+      calculation.profit,
+      calculation.marginPercentage,
+      now,
+    );
+
+    await this.profitabilityRepository.upsert(snapshot);
+
+    return created;
   }
 }

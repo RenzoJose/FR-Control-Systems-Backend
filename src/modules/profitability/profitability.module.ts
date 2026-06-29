@@ -19,6 +19,6 @@ import { SalesModule } from '../sales/sales.module';
     GetSaleProfitabilityUseCase,
     RecalculateProfitabilityUseCase,
   ],
-  exports: [ProfitCalculatorService, PROFITABILITY_REPOSITORY],
+  exports: [ProfitCalculatorService, PROFITABILITY_REPOSITORY, RecalculateProfitabilityUseCase],
 })
 export class ProfitabilityModule {}

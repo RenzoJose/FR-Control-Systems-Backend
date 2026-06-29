@@ -1,0 +1,7 @@
+export enum SaleChannel {
+  DIRECT = 'DIRECT',
+  FALABELLA = 'FALABELLA',
+  MERCADO_LIBRE = 'MERCADO_LIBRE',
+  RIPLEY = 'RIPLEY',
+  CUSTOM = 'CUSTOM',
+}

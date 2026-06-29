@@ -7,6 +7,10 @@ import { PrismaModule } from './infrastructure/database/prisma/prisma.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { SuppliersModule } from './modules/suppliers/suppliers.module';
 import { ProductsModule } from './modules/products/products.module';
+import { SalesModule } from './modules/sales/sales.module';
+import { ProfitabilityModule } from './modules/profitability/profitability.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { SaleCostsModule } from './modules/sale-costs/sale-costs.module';
 
 @Module({
   imports: [
@@ -19,6 +23,10 @@ import { ProductsModule } from './modules/products/products.module';
     CategoriesModule,
     SuppliersModule,
     ProductsModule,
+    SalesModule,
+    ProfitabilityModule,
+    DashboardModule,
+    SaleCostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

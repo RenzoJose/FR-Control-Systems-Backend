@@ -1,0 +1,1 @@
+export const SALE_COST_REPOSITORY = Symbol('SALE_COST_REPOSITORY');

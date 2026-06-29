@@ -115,7 +115,9 @@ export class PrismaSaleRepository implements SaleRepository {
       where,
       include: {
         items: true,
-        costs: true,
+        costs: {
+          where: { deletedAt: null },
+        },
       },
       orderBy: { saleDate: 'desc' },
     });
@@ -131,7 +133,9 @@ export class PrismaSaleRepository implements SaleRepository {
       },
       include: {
         items: true,
-        costs: true,
+        costs: {
+          where: { deletedAt: null },
+        },
       },
     });
 

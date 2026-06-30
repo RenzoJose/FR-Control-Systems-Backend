@@ -19,6 +19,7 @@ describe('CreateSaleUseCase', () => {
       create: jest.fn(),
       findAll: jest.fn(),
       findById: jest.fn(),
+      update: jest.fn(),
     };
 
     profitabilityRepository = {

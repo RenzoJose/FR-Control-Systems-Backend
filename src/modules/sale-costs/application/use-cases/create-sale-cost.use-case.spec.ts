@@ -28,6 +28,7 @@ describe('CreateSaleCostUseCase', () => {
       create: jest.fn(),
       findAll: jest.fn(),
       findById: jest.fn(),
+      update: jest.fn(),
     };
 
     recalculate = { execute: jest.fn() } as never;

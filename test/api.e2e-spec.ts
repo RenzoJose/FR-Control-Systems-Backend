@@ -422,6 +422,130 @@ describe('REST API (e2e)', () => {
         .get(`/api/v1/sales/${randomUUID()}`)
         .expect(404);
     });
+
+    it('PATCH :id — should update sale channel and date', async () => {
+      const createRes = await request(app.getHttpServer())
+        .post('/api/v1/sales')
+        .send({
+          saleChannel: 'FALABELLA',
+          saleDate: '2026-06-15',
+          items: [{ productId: prodId, quantity: 1, unitPriceGross: 1000, unitPriceNet: 840, vatAmount: 160 }],
+        });
+      const saleId = createRes.body.data.id;
+
+      const res = await request(app.getHttpServer())
+        .patch(`/api/v1/sales/${saleId}`)
+        .send({ saleChannel: 'DIRECT', saleDate: '2026-07-01' })
+        .expect(200);
+
+      expect(res.body.data.saleChannel).toBe('DIRECT');
+      expect(res.body.data.saleDate).toBe('2026-07-01T00:00:00.000Z');
+    });
+
+    it('PATCH :id — should replace items and recalculate profit', async () => {
+      const createRes = await request(app.getHttpServer())
+        .post('/api/v1/sales')
+        .send({
+          saleChannel: 'DIRECT',
+          saleDate: '2026-06-01',
+          items: [{ productId: prodId, quantity: 1, unitPriceGross: 1000, unitPriceNet: 840, vatAmount: 160 }],
+        });
+      const saleId = createRes.body.data.id;
+
+      const res = await request(app.getHttpServer())
+        .patch(`/api/v1/sales/${saleId}`)
+        .send({
+          items: [{ productId: prodId, quantity: 3, unitPriceGross: 3000, unitPriceNet: 2521, vatAmount: 479 }],
+        })
+        .expect(200);
+
+      expect(res.body.data.items).toHaveLength(1);
+      expect(res.body.data.items[0].quantity).toBe(3);
+
+      // verify profit snapshot was recalculated
+      const snapRes = await request(app.getHttpServer())
+        .get(`/api/v1/profitability/sales/${saleId}`)
+        .expect(200);
+
+      expect(Number(snapRes.body.data.revenueNet)).toBe(7563);
+    });
+
+    it('PATCH :id — should replace costs and recalculate profit', async () => {
+      const createRes = await request(app.getHttpServer())
+        .post('/api/v1/sales')
+        .send({
+          saleChannel: 'DIRECT',
+          saleDate: '2026-06-01',
+          items: [{ productId: prodId, quantity: 1, unitPriceGross: 500000, unitPriceNet: 420168, vatAmount: 79832 }],
+        });
+      const saleId = createRes.body.data.id;
+
+      const res = await request(app.getHttpServer())
+        .patch(`/api/v1/sales/${saleId}`)
+        .send({
+          costs: [{
+            costType: 'TRANSPORT',
+            description: 'Flete express',
+            occurredAt: '2026-06-02',
+            costGross: 50000,
+            costNet: 42017,
+            vatAmount: 7983,
+          }],
+        })
+        .expect(200);
+
+      expect(res.body.data.costs).toHaveLength(1);
+      expect(res.body.data.costs[0].costNet).toBe(42017);
+    });
+
+    it('PATCH :id — should update everything at once', async () => {
+      const createRes = await request(app.getHttpServer())
+        .post('/api/v1/sales')
+        .send({
+          saleChannel: 'FALABELLA',
+          saleDate: '2026-06-10',
+          items: [{ productId: prodId, quantity: 1, unitPriceGross: 1000, unitPriceNet: 840, vatAmount: 160 }],
+          costs: [{ costType: 'MARKETPLACE', description: 'Comisión', occurredAt: '2026-06-10', costGross: 100, costNet: 84, vatAmount: 16 }],
+        });
+      const saleId = createRes.body.data.id;
+
+      const res = await request(app.getHttpServer())
+        .patch(`/api/v1/sales/${saleId}`)
+        .send({
+          saleChannel: 'RIPLEY',
+          saleDate: '2026-07-15',
+          items: [{ productId: prodId, quantity: 2, unitPriceGross: 2000, unitPriceNet: 1681, vatAmount: 319 }],
+          costs: [{ costType: 'TRANSPORT', description: 'Flete', occurredAt: '2026-07-15', costGross: 200, costNet: 168, vatAmount: 32 }],
+        })
+        .expect(200);
+
+      expect(res.body.data.saleChannel).toBe('RIPLEY');
+      expect(res.body.data.items).toHaveLength(1);
+      expect(res.body.data.costs).toHaveLength(1);
+    });
+
+    it('PATCH :id — should 404 for nonexistent sale', async () => {
+      await request(app.getHttpServer())
+        .patch(`/api/v1/sales/${randomUUID()}`)
+        .send({ saleChannel: 'DIRECT' })
+        .expect(404);
+    });
+
+    it('PATCH :id — should reject invalid saleChannel', async () => {
+      const createRes = await request(app.getHttpServer())
+        .post('/api/v1/sales')
+        .send({
+          saleChannel: 'DIRECT',
+          saleDate: '2026-06-01',
+          items: [{ productId: prodId, quantity: 1, unitPriceGross: 1000, unitPriceNet: 840, vatAmount: 160 }],
+        });
+      const saleId = createRes.body.data.id;
+
+      await request(app.getHttpServer())
+        .patch(`/api/v1/sales/${saleId}`)
+        .send({ saleChannel: 'INVALID' })
+        .expect(400);
+    });
   });
 
   // ── Sale Costs ──────────────────────────────────────────────

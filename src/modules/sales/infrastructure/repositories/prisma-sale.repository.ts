@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../../../../infrastructure/database/prisma/prisma.service';
 import { SaleRepository } from '../../domain/repositories/sale.repository';
 import { Sale } from '../../domain/entities/sale.entity';
 import { SaleItem } from '../../domain/entities/sale-item.entity';
 import { SaleCost } from '../../domain/entities/sale-cost.entity';
+import type { UpdateSaleData } from '../../domain/repositories/sale.repository';
 
 interface SaleResult {
   id: string;
@@ -82,6 +84,60 @@ export class PrismaSaleRepository implements SaleRepository {
     });
 
     return this.toDomain(created);
+  }
+
+  async update(id: string, data: UpdateSaleData): Promise<Sale> {
+    const updateData: Record<string, unknown> = {};
+
+    if (data.saleChannel !== undefined) {
+      updateData.saleChannel = data.saleChannel;
+    }
+    if (data.saleDate !== undefined) {
+      updateData.saleDate = data.saleDate;
+    }
+
+    if (data.items !== undefined) {
+      updateData.items = {
+        deleteMany: {},
+        create: data.items.map((item) => ({
+          id: randomUUID(),
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPriceGross: item.unitPriceGross,
+          unitPriceNet: item.unitPriceNet,
+          vatAmount: item.vatAmount,
+        })),
+      };
+    }
+
+    if (data.costs !== undefined) {
+      updateData.costs = {
+        updateMany: {
+          where: { deletedAt: null },
+          data: { deletedAt: new Date() },
+        },
+        create: data.costs.map((cost) => ({
+          id: randomUUID(),
+          costType: cost.costType,
+          description: cost.description,
+          occurredAt: cost.occurredAt,
+          costGross: cost.costGross,
+          costNet: cost.costNet,
+          vatAmount: cost.vatAmount,
+        })),
+      };
+    }
+
+    const updated = await this.prisma.sale.update({
+      where: { id },
+      data: updateData as never,
+      include: {
+        items: true,
+        costs: { where: { deletedAt: null } },
+      },
+    });
+
+    return this.toDomain(updated as never as SaleResult);
   }
 
   async findAll(filters?: {

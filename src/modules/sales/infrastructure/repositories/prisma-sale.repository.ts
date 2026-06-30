@@ -87,54 +87,69 @@ export class PrismaSaleRepository implements SaleRepository {
   }
 
   async update(id: string, data: UpdateSaleData): Promise<Sale> {
-    const updateData: Record<string, unknown> = {};
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const saleFields: Record<string, unknown> = {};
 
-    if (data.saleChannel !== undefined) {
-      updateData.saleChannel = data.saleChannel;
-    }
-    if (data.saleDate !== undefined) {
-      updateData.saleDate = data.saleDate;
-    }
+      if (data.saleChannel !== undefined) {
+        saleFields.saleChannel = data.saleChannel;
+      }
+      if (data.saleDate !== undefined) {
+        saleFields.saleDate = data.saleDate;
+      }
 
-    if (data.items !== undefined) {
-      updateData.items = {
-        deleteMany: {},
-        create: data.items.map((item) => ({
-          id: randomUUID(),
-          productId: item.productId,
-          quantity: item.quantity,
-          unitPriceGross: item.unitPriceGross,
-          unitPriceNet: item.unitPriceNet,
-          vatAmount: item.vatAmount,
-        })),
-      };
-    }
+      if (Object.keys(saleFields).length > 0) {
+        await tx.sale.update({ where: { id }, data: saleFields });
+      }
 
-    if (data.costs !== undefined) {
-      updateData.costs = {
-        updateMany: {
-          where: { deletedAt: null },
+      if (data.items !== undefined) {
+        await tx.saleItem.deleteMany({ where: { saleId: id } });
+
+        if (data.items.length > 0) {
+          await tx.saleItem.createMany({
+            data: data.items.map((item) => ({
+              id: randomUUID(),
+              saleId: id,
+              productId: item.productId,
+              quantity: item.quantity,
+              unitPriceGross: item.unitPriceGross,
+              unitPriceNet: item.unitPriceNet,
+              vatAmount: item.vatAmount,
+            })),
+          });
+        }
+      }
+
+      if (data.costs !== undefined) {
+        await tx.saleCost.updateMany({
+          where: { saleId: id, deletedAt: null },
           data: { deletedAt: new Date() },
-        },
-        create: data.costs.map((cost) => ({
-          id: randomUUID(),
-          costType: cost.costType,
-          description: cost.description,
-          occurredAt: cost.occurredAt,
-          costGross: cost.costGross,
-          costNet: cost.costNet,
-          vatAmount: cost.vatAmount,
-        })),
-      };
-    }
+        });
 
-    const updated = await this.prisma.sale.update({
-      where: { id },
-      data: updateData as never,
-      include: {
-        items: true,
-        costs: { where: { deletedAt: null } },
-      },
+        if (data.costs.length > 0) {
+          await tx.saleCost.createMany({
+            data: data.costs.map((cost) => ({
+              id: randomUUID(),
+              saleId: id,
+              costType: cost.costType as never,
+              description: cost.description,
+              occurredAt: cost.occurredAt,
+              costGross: cost.costGross,
+              costNet: cost.costNet,
+              vatAmount: cost.vatAmount,
+            })),
+          });
+        }
+      }
+
+      const result = await tx.sale.findUnique({
+        where: { id },
+        include: {
+          items: true,
+          costs: { where: { deletedAt: null } },
+        },
+      });
+
+      return result!;
     });
 
     return this.toDomain(updated as never as SaleResult);

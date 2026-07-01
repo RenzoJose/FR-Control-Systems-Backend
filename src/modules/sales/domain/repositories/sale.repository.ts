@@ -25,11 +25,10 @@ export interface SaleRepository {
 
   update(id: string, data: UpdateSaleData): Promise<Sale>;
 
-  findAll(filters?: {
-    channel?: string;
-    dateFrom?: string;
-    dateTo?: string;
-  }): Promise<Sale[]>;
+  findAll(
+    filters?: { channel?: string; dateFrom?: string; dateTo?: string },
+    pagination?: { skip: number; take: number },
+  ): Promise<{ data: Sale[]; total: number }>;
 
   findById(id: string): Promise<Sale | null>;
 }

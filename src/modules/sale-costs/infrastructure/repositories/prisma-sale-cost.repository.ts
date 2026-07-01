@@ -38,12 +38,23 @@ export class PrismaSaleCostRepository implements SaleCostRepository {
     return this.toDomain(created);
   }
 
-  async findAllBySaleId(saleId: string): Promise<SaleCost[]> {
-    const costs = await this.prisma.saleCost.findMany({
-      where: { saleId, deletedAt: null },
-    });
+  async findAllBySaleId(saleId: string, pagination?: { skip: number; take: number }): Promise<{ data: SaleCost[]; total: number }> {
+    const where = { saleId, deletedAt: null };
 
-    return costs.map((c) => this.toDomain(c as never as SaleCostResult));
+    const [costs, total] = await this.prisma.$transaction([
+      this.prisma.saleCost.findMany({
+        where,
+        skip: pagination?.skip,
+        take: pagination?.take,
+        orderBy: { occurredAt: 'desc' },
+      }),
+      this.prisma.saleCost.count({ where }),
+    ]);
+
+    return {
+      data: costs.map((c) => this.toDomain(c as never as SaleCostResult)),
+      total,
+    };
   }
 
   async findById(id: string): Promise<SaleCost | null> {

@@ -155,11 +155,10 @@ export class PrismaSaleRepository implements SaleRepository {
     return this.toDomain(updated as never as SaleResult);
   }
 
-  async findAll(filters?: {
-    channel?: string;
-    dateFrom?: string;
-    dateTo?: string;
-  }): Promise<Sale[]> {
+  async findAll(
+    filters?: { channel?: string; dateFrom?: string; dateTo?: string },
+    pagination?: { skip: number; take: number },
+  ): Promise<{ data: Sale[]; total: number }> {
     const where: Record<string, unknown> = {
       deletedAt: null,
     };
@@ -182,18 +181,24 @@ export class PrismaSaleRepository implements SaleRepository {
       where.saleDate = saleDate;
     }
 
-    const sales = await this.prisma.sale.findMany({
-      where,
-      include: {
-        items: true,
-        costs: {
-          where: { deletedAt: null },
+    const [sales, total] = await this.prisma.$transaction([
+      this.prisma.sale.findMany({
+        where,
+        skip: pagination?.skip,
+        take: pagination?.take,
+        include: {
+          items: true,
+          costs: { where: { deletedAt: null } },
         },
-      },
-      orderBy: { saleDate: 'desc' },
-    });
+        orderBy: { saleDate: 'desc' },
+      }),
+      this.prisma.sale.count({ where }),
+    ]);
 
-    return sales.map((s) => this.toDomain(s as never as SaleResult));
+    return {
+      data: sales.map((s) => this.toDomain(s as never as SaleResult)),
+      total,
+    };
   }
 
   async findById(id: string): Promise<Sale | null> {

@@ -41,18 +41,22 @@ export class SalesController {
   @ApiQuery({ name: 'channel', required: false })
   @ApiQuery({ name: 'dateFrom', required: false })
   @ApiQuery({ name: 'dateTo', required: false })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
   async findAll(
     @Query('channel') channel?: string,
     @Query('dateFrom') dateFrom?: string,
     @Query('dateTo') dateTo?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
   ) {
-    const sales = await this.listSalesUseCase.execute({
+    return this.listSalesUseCase.execute({
       channel,
       dateFrom,
       dateTo,
+      page,
+      limit,
     });
-
-    return { data: sales };
   }
 
   @Get(':id')

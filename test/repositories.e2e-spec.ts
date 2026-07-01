@@ -86,7 +86,7 @@ describe('Repositories (integration)', () => {
       await categoryRepo.create(deleted);
       await categoryRepo.deactivate(deleted.id);
 
-      const results = await categoryRepo.findAll();
+      const { data: results } = await categoryRepo.findAll();
 
       expect(results).toHaveLength(1);
       expect(results[0].name).toBe('Activo');
@@ -137,7 +137,7 @@ describe('Repositories (integration)', () => {
       await supplierRepo.create(s2);
       await supplierRepo.deactivate(s2.id);
 
-      const results = await supplierRepo.findAll();
+      const { data: results } = await supplierRepo.findAll();
 
       expect(results).toHaveLength(1);
       expect(results[0].name).toBe('Proveedor 1');
@@ -187,7 +187,7 @@ describe('Repositories (integration)', () => {
       const otherCatId = (await categoryRepo.create(new Category(randomUUID(), 'Cocina'))).id;
       await productRepo.create(new Product(randomUUID(), 'B-1', 'Prod B', otherCatId, supId));
 
-      const results = await productRepo.findAll({ categoryId: catId });
+      const { data: results } = await productRepo.findAll({ categoryId: catId });
 
       expect(results).toHaveLength(1);
       expect(results[0].sku).toBe('A-1');
@@ -198,7 +198,7 @@ describe('Repositories (integration)', () => {
       const otherSupId = (await supplierRepo.create(new Supplier(randomUUID(), 'Otro Fab'))).id;
       await productRepo.create(new Product(randomUUID(), 'D-1', 'Prod D', catId, otherSupId));
 
-      const results = await productRepo.findAll({ supplierId: supId });
+      const { data: results } = await productRepo.findAll({ supplierId: supId });
 
       expect(results).toHaveLength(1);
     });
@@ -207,7 +207,7 @@ describe('Repositories (integration)', () => {
       await productRepo.create(new Product(randomUUID(), 'S-001', 'Sofá Milano', catId, supId));
       await productRepo.create(new Product(randomUUID(), 'M-001', 'Mesa Comedor', catId, supId));
 
-      const results = await productRepo.findAll({ search: 'milano' });
+      const { data: results } = await productRepo.findAll({ search: 'milano' });
 
       expect(results).toHaveLength(1);
       expect(results[0].name).toBe('Sofá Milano');
@@ -216,7 +216,7 @@ describe('Repositories (integration)', () => {
     it('findAll — should search by sku', async () => {
       await productRepo.create(new Product(randomUUID(), 'SOFA-001', 'Sofá', catId, supId));
 
-      const results = await productRepo.findAll({ search: 'SOFA-001' });
+      const { data: results } = await productRepo.findAll({ search: 'SOFA-001' });
 
       expect(results).toHaveLength(1);
     });
@@ -228,7 +228,7 @@ describe('Repositories (integration)', () => {
       await productRepo.create(p2);
       await productRepo.deactivate(p2.id);
 
-      const results = await productRepo.findAll();
+      const { data: results } = await productRepo.findAll();
 
       expect(results).toHaveLength(1);
     });
@@ -307,7 +307,7 @@ describe('Repositories (integration)', () => {
         new SaleItem(randomUUID(), '', prodId, 1, 1000, 840, 160, now),
       ], []));
 
-      const results = await saleRepo.findAll({ channel: 'FALABELLA' });
+      const { data: results } = await saleRepo.findAll({ channel: 'FALABELLA' });
 
       expect(results).toHaveLength(1);
       expect(results[0].saleChannel).toBe('FALABELLA');
@@ -322,7 +322,7 @@ describe('Repositories (integration)', () => {
         new SaleItem(randomUUID(), '', prodId, 1, 1000, 840, 160, now),
       ], []));
 
-      const results = await saleRepo.findAll({ dateFrom: '2026-06-15', dateTo: '2026-07-15' });
+      const { data: results } = await saleRepo.findAll({ dateFrom: '2026-06-15', dateTo: '2026-07-15' });
 
       expect(results).toHaveLength(1);
     });
@@ -358,7 +358,7 @@ describe('Repositories (integration)', () => {
       await saleCostRepo.create(c2);
       await saleCostRepo.deactivate(c2.id);
 
-      const results = await saleCostRepo.findAllBySaleId(saleId);
+      const { data: results } = await saleCostRepo.findAllBySaleId(saleId);
 
       expect(results).toHaveLength(1);
       expect(results[0].description).toBe('Costo 1');

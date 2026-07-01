@@ -29,23 +29,34 @@ export class PrismaSupplierRepository implements SupplierRepository {
       created.deletedAt ?? undefined,
     );
   }
-  async findAll(): Promise<Supplier[]> {
-    const suppliers = await this.prisma.supplier.findMany({
-      where: { deletedAt: null },
-    });
+  async findAll(pagination?: { skip: number; take: number }): Promise<{ data: Supplier[]; total: number }> {
+    const where = { deletedAt: null };
 
-    return suppliers.map(
-      (s) =>
-        new Supplier(
-          s.id,
-          s.name,
-          s.contactName ?? undefined,
-          s.phone ?? undefined,
-          s.email ?? undefined,
-          s.notes ?? undefined,
-          s.deletedAt ?? undefined,
-        ),
-    );
+    const [suppliers, total] = await this.prisma.$transaction([
+      this.prisma.supplier.findMany({
+        where,
+        skip: pagination?.skip,
+        take: pagination?.take,
+        orderBy: { name: 'asc' },
+      }),
+      this.prisma.supplier.count({ where }),
+    ]);
+
+    return {
+      data: suppliers.map(
+        (s) =>
+          new Supplier(
+            s.id,
+            s.name,
+            s.contactName ?? undefined,
+            s.phone ?? undefined,
+            s.email ?? undefined,
+            s.notes ?? undefined,
+            s.deletedAt ?? undefined,
+          ),
+      ),
+      total,
+    };
   }
 
   async findById(id: string): Promise<Supplier | null> {

@@ -29,15 +29,16 @@ describe('ListSaleCostsUseCase', () => {
     useCase = module.get<ListSaleCostsUseCase>(ListSaleCostsUseCase);
   });
 
-  it('should list all costs for a sale', async () => {
-    saleCostRepository.findAllBySaleId.mockResolvedValue([
-      { id: 'cost-1' },
-      { id: 'cost-2' },
-    ] as never);
+  it('should list all costs for a sale with pagination', async () => {
+    saleCostRepository.findAllBySaleId.mockResolvedValue({
+      data: [{ id: 'cost-1' }, { id: 'cost-2' }] as never,
+      total: 2,
+    });
 
     const result = await useCase.execute('sale-1');
 
-    expect(result).toHaveLength(2);
-    expect(saleCostRepository.findAllBySaleId).toHaveBeenCalledWith('sale-1');
+    expect(result.data).toHaveLength(2);
+    expect(result.meta.total).toBe(2);
+    expect(saleCostRepository.findAllBySaleId).toHaveBeenCalledWith('sale-1', { skip: 0, take: 10 });
   });
 });

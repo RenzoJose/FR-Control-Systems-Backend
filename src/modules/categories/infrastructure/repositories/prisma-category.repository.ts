@@ -27,23 +27,32 @@ export class PrismaCategoryRepository implements CategoryRepository {
     );
   }
 
-  async findAll(): Promise<Category[]> {
-    const categories = await this.prisma.category.findMany({
-      where: {
-        deletedAt: null,
-      },
-    });
+  async findAll(pagination?: { skip: number; take: number }): Promise<{ data: Category[]; total: number }> {
+    const where = { deletedAt: null };
 
-    return categories.map(
-      (category) =>
-        new Category(
-          category.id,
-          category.name,
-          category.slug ?? undefined,
-          category.description ?? undefined,
-          category.deletedAt ?? undefined,
-        ),
-    );
+    const [categories, total] = await this.prisma.$transaction([
+      this.prisma.category.findMany({
+        where,
+        skip: pagination?.skip,
+        take: pagination?.take,
+        orderBy: { name: 'asc' },
+      }),
+      this.prisma.category.count({ where }),
+    ]);
+
+    return {
+      data: categories.map(
+        (category) =>
+          new Category(
+            category.id,
+            category.name,
+            category.slug ?? undefined,
+            category.description ?? undefined,
+            category.deletedAt ?? undefined,
+          ),
+      ),
+      total,
+    };
   }
 
   async findById(id: string): Promise<Category | null> {

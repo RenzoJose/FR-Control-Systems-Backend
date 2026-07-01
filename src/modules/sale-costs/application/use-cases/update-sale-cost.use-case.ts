@@ -4,6 +4,7 @@ import { SALE_COST_REPOSITORY } from '../../domain/repositories/sale-cost.reposi
 import { UpdateSaleCostDto } from '../dto/update-sale-cost.dto';
 import { SaleCost } from '../../domain/entities/sale-cost.entity';
 import { RecalculateProfitabilityUseCase } from '../../../profitability/application/use-cases/recalculate-profitability.use-case';
+import { applyVatRate } from '../../../../shared/vat/vat.helper';
 
 @Injectable()
 export class UpdateSaleCostUseCase {
@@ -29,15 +30,24 @@ export class UpdateSaleCostUseCase {
 
     const now = new Date();
 
+    const costGross = dto.costGross ?? existing.costGross;
+    const costNet = dto.costNet !== undefined ? dto.costNet : existing.costNet;
+    const vatAmount = dto.vatAmount !== undefined ? dto.vatAmount : existing.vatAmount;
+    const vatRate = dto.vatRate;
+
+    const vat = vatRate !== undefined
+      ? applyVatRate({ unitPriceGross: costGross, vatRate })
+      : applyVatRate({ unitPriceGross: costGross, unitPriceNet: costNet, vatAmount });
+
     const updated = new SaleCost(
       costId,
       saleId,
       dto.costType ?? existing.costType,
       dto.description !== undefined ? dto.description : existing.description,
       dto.occurredAt ? new Date(dto.occurredAt) : existing.occurredAt,
-      dto.costGross ?? existing.costGross,
-      dto.costNet ?? existing.costNet,
-      dto.vatAmount ?? existing.vatAmount,
+      vat.unitPriceGross,
+      vat.unitPriceNet,
+      vat.vatAmount,
       existing.createdAt,
       now,
     );

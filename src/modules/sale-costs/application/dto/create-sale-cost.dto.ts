@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
   Min,
 } from 'class-validator';
 import { CostType } from '../../../../shared/enums/cost-type.enum';
@@ -28,13 +29,22 @@ export class CreateSaleCostDto {
   @Min(0)
   costGross!: number;
 
-  @ApiProperty({ example: 42016.81 })
+  @ApiPropertyOptional({ example: 42016.81 })
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  costNet!: number;
+  costNet?: number;
 
-  @ApiProperty({ example: 7983.19 })
+  @ApiPropertyOptional({ example: 7983.19 })
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  vatAmount!: number;
+  vatAmount?: number;
+
+  @ApiPropertyOptional({ example: 19 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  @Max(100)
+  vatRate?: number;
 }

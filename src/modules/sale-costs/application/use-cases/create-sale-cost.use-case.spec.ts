@@ -7,6 +7,7 @@ import { SALE_REPOSITORY } from '../../../sales/domain/repositories/sale.reposit
 import type { SaleRepository } from '../../../sales/domain/repositories/sale.repository';
 import { RecalculateProfitabilityUseCase } from '../../../profitability/application/use-cases/recalculate-profitability.use-case';
 import { CreateSaleCostDto } from '../dto/create-sale-cost.dto';
+import { CostType } from '../../../../shared/enums/cost-type.enum';
 
 describe('CreateSaleCostUseCase', () => {
   let useCase: CreateSaleCostUseCase;
@@ -27,6 +28,7 @@ describe('CreateSaleCostUseCase', () => {
       create: jest.fn(),
       findAll: jest.fn(),
       findById: jest.fn(),
+      update: jest.fn(),
     };
 
     recalculate = { execute: jest.fn() } as never;
@@ -62,7 +64,7 @@ describe('CreateSaleCostUseCase', () => {
     } as never);
 
     const dto: CreateSaleCostDto = {
-      costType: 'TRANSPORT',
+      costType: CostType.TRANSPORT,
       occurredAt: '2026-06-28',
       costGross: 50000,
       costNet: 42016.81,
@@ -80,7 +82,7 @@ describe('CreateSaleCostUseCase', () => {
     saleRepository.findById.mockResolvedValue(null);
 
     const dto: CreateSaleCostDto = {
-      costType: 'TRANSPORT',
+      costType: CostType.TRANSPORT,
       occurredAt: '2026-06-28',
       costGross: 50000,
       costNet: 42016.81,

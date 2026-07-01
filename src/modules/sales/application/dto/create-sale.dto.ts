@@ -9,7 +9,7 @@ import {
 import { Type } from 'class-transformer';
 import { SaleChannel } from '../../../../shared/enums/sale-channel.enum';
 import { CreateSaleItemDto } from './create-sale-item.dto';
-import { CreateSaleCostDto } from './create-sale-cost.dto';
+import { SaleCostEntryDto } from './sale-cost-entry.dto';
 
 export class CreateSaleDto {
   @ApiProperty({ enum: SaleChannel, example: 'FALABELLA' })
@@ -26,10 +26,10 @@ export class CreateSaleDto {
   @Type(() => CreateSaleItemDto)
   items!: CreateSaleItemDto[];
 
-  @ApiPropertyOptional({ type: [CreateSaleCostDto] })
+  @ApiPropertyOptional({ type: [SaleCostEntryDto] })
   @IsArray()
   @IsOptional()
   @ValidateNested({ each: true })
-  @Type(() => CreateSaleCostDto)
-  costs?: CreateSaleCostDto[];
+  @Type(() => SaleCostEntryDto)
+  costs?: SaleCostEntryDto[];
 }

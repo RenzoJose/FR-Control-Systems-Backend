@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Supplier } from '../../domain/entities/supplier.entity';
 import { SupplierRepository } from './supplier.repository';
-import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
+import { PrismaService } from '../../../../infrastructure/database/prisma/prisma.service';
 
 @Injectable()
 export class PrismaSupplierRepository implements SupplierRepository {

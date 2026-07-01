@@ -1,8 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { CostType } from '../../../../shared/enums/cost-type.enum';
 
-export class UpdateSaleCostDto {
+export class SaleCostEntryDto {
   @ApiProperty({ enum: CostType, example: 'SUPPLIER' })
   @IsEnum(CostType)
   costType!: CostType;

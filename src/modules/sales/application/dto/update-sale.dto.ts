@@ -3,7 +3,7 @@ import { IsArray, IsDateString, IsEnum, IsOptional, ValidateNested } from 'class
 import { Type } from 'class-transformer';
 import { SaleChannel } from '../../../../shared/enums/sale-channel.enum';
 import { UpdateSaleItemDto } from './update-sale-item.dto';
-import { UpdateSaleCostDto } from './update-sale-cost.dto';
+import { UpdateSaleCostEntryDto } from './update-sale-cost-entry.dto';
 
 export class UpdateSaleDto {
   @ApiPropertyOptional({ enum: SaleChannel, example: 'FALABELLA' })
@@ -23,10 +23,10 @@ export class UpdateSaleDto {
   @Type(() => UpdateSaleItemDto)
   items?: UpdateSaleItemDto[];
 
-  @ApiPropertyOptional({ type: [UpdateSaleCostDto] })
+  @ApiPropertyOptional({ type: [UpdateSaleCostEntryDto] })
   @IsArray()
   @IsOptional()
   @ValidateNested({ each: true })
-  @Type(() => UpdateSaleCostDto)
-  costs?: UpdateSaleCostDto[];
+  @Type(() => UpdateSaleCostEntryDto)
+  costs?: UpdateSaleCostEntryDto[];
 }

@@ -10,6 +10,7 @@ import { ProfitCalculatorService } from '../../../profitability/domain/services/
 import { PROFITABILITY_REPOSITORY } from '../../../profitability/domain/repositories/profitability.repository.token';
 import type { ProfitabilityRepository } from '../../../profitability/domain/repositories/profitability.repository';
 import { ProfitSnapshot } from '../../../profitability/domain/entities/profit-snapshot.entity';
+import { applyVatRate } from '../../../../shared/vat/vat.helper';
 
 @Injectable()
 export class CreateSaleUseCase {
@@ -25,35 +26,47 @@ export class CreateSaleUseCase {
     const now = new Date();
     const saleId = randomUUID();
 
-    const items = dto.items.map(
-      (item) =>
-        new SaleItem(
-          randomUUID(),
-          saleId,
-          item.productId,
-          item.quantity,
-          item.unitPriceGross,
-          item.unitPriceNet,
-          item.vatAmount,
-          now,
-        ),
-    );
+    const items = dto.items.map((item) => {
+      const vat = applyVatRate({
+        unitPriceGross: item.unitPriceGross,
+        unitPriceNet: item.unitPriceNet,
+        vatAmount: item.vatAmount,
+        vatRate: item.vatRate,
+      });
 
-    const costs = (dto.costs ?? []).map(
-      (cost) =>
-        new SaleCost(
-          randomUUID(),
-          saleId,
-          cost.costType,
-          cost.description,
-          new Date(cost.occurredAt),
-          cost.costGross,
-          cost.costNet,
-          cost.vatAmount,
-          now,
-          now,
-        ),
-    );
+      return new SaleItem(
+        randomUUID(),
+        saleId,
+        item.productId,
+        item.quantity,
+        vat.unitPriceGross,
+        vat.unitPriceNet,
+        vat.vatAmount,
+        now,
+      );
+    });
+
+    const costs = (dto.costs ?? []).map((cost) => {
+      const vat = applyVatRate({
+        unitPriceGross: cost.costGross,
+        unitPriceNet: cost.costNet,
+        vatAmount: cost.vatAmount,
+        vatRate: cost.vatRate,
+      });
+
+      return new SaleCost(
+        randomUUID(),
+        saleId,
+        cost.costType,
+        cost.description,
+        new Date(cost.occurredAt),
+        vat.unitPriceGross,
+        vat.unitPriceNet,
+        vat.vatAmount,
+        now,
+        now,
+      );
+    });
 
     const sale = new Sale(
       saleId,

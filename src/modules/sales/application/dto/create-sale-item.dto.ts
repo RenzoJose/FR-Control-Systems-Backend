@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNumber, IsUUID, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsInt, IsNumber, IsOptional, IsUUID, Max, Min } from 'class-validator';
 
 export class CreateSaleItemDto {
   @ApiProperty({ example: 'uuid' })
@@ -16,13 +16,22 @@ export class CreateSaleItemDto {
   @Min(0)
   unitPriceGross!: number;
 
-  @ApiProperty({ example: 210084.03 })
+  @ApiPropertyOptional({ example: 210084.03 })
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  unitPriceNet!: number;
+  unitPriceNet?: number;
 
-  @ApiProperty({ example: 39915.97 })
+  @ApiPropertyOptional({ example: 39915.97 })
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  vatAmount!: number;
+  vatAmount?: number;
+
+  @ApiPropertyOptional({ example: 19 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  @Max(100)
+  vatRate?: number;
 }

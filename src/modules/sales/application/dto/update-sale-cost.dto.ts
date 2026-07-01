@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsDateString, IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { CostType } from '../../../../shared/enums/cost-type.enum';
 
 export class UpdateSaleCostDto {
@@ -21,13 +21,22 @@ export class UpdateSaleCostDto {
   @Min(0)
   costGross!: number;
 
-  @ApiProperty({ example: 126050.42 })
+  @ApiPropertyOptional({ example: 126050.42 })
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  costNet!: number;
+  costNet?: number;
 
-  @ApiProperty({ example: 23949.58 })
+  @ApiPropertyOptional({ example: 23949.58 })
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  vatAmount!: number;
+  vatAmount?: number;
+
+  @ApiPropertyOptional({ example: 19 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  @Max(100)
+  vatRate?: number;
 }

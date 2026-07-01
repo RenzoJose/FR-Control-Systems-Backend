@@ -7,6 +7,7 @@ import { CreateSaleCostDto } from '../dto/create-sale-cost.dto';
 import { RecalculateProfitabilityUseCase } from '../../../profitability/application/use-cases/recalculate-profitability.use-case';
 import { SALE_REPOSITORY } from '../../../sales/domain/repositories/sale.repository.token';
 import type { SaleRepository } from '../../../sales/domain/repositories/sale.repository';
+import { applyVatRate } from '../../../../shared/vat/vat.helper';
 
 @Injectable()
 export class CreateSaleCostUseCase {
@@ -30,15 +31,22 @@ export class CreateSaleCostUseCase {
 
     const now = new Date();
 
+    const vat = applyVatRate({
+      unitPriceGross: dto.costGross,
+      unitPriceNet: dto.costNet,
+      vatAmount: dto.vatAmount,
+      vatRate: dto.vatRate,
+    });
+
     const cost = new SaleCost(
       randomUUID(),
       saleId,
       dto.costType,
       dto.description,
       new Date(dto.occurredAt),
-      dto.costGross,
-      dto.costNet,
-      dto.vatAmount,
+      vat.unitPriceGross,
+      vat.unitPriceNet,
+      vat.vatAmount,
       now,
       now,
     );

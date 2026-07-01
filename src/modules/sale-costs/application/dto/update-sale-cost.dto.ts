@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
   Min,
 } from 'class-validator';
 import { CostType } from '../../../../shared/enums/cost-type.enum';
@@ -42,4 +43,11 @@ export class UpdateSaleCostDto {
   @IsOptional()
   @Min(0)
   vatAmount?: number;
+
+  @ApiPropertyOptional({ example: 19 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  @Max(100)
+  vatRate?: number;
 }

@@ -8,8 +8,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { CreateCategoryDto } from '../../application/dto/create-category.dto';
 import { UpdateCategoryDto } from '../../application/dto/update-category.dto';
@@ -46,10 +47,10 @@ export class CategoriesController {
   @Get()
   @ApiOperation({ summary: 'List categories' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Categories listed' })
-  async findAll() {
-    const categories = await this.listCategoriesUseCase.execute();
-
-    return { data: categories };
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
+    return this.listCategoriesUseCase.execute(page, limit);
   }
 
   @Get(':id')

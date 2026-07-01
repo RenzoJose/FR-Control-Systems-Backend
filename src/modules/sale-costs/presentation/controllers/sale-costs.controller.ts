@@ -8,8 +8,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateSaleCostDto } from '../../application/dto/create-sale-cost.dto';
 import { UpdateSaleCostDto } from '../../application/dto/update-sale-cost.dto';
 import { CreateSaleCostUseCase } from '../../application/use-cases/create-sale-cost.use-case';
@@ -43,10 +44,14 @@ export class SaleCostsController {
   @Get()
   @ApiOperation({ summary: 'List costs for a sale' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Costs listed' })
-  async findAll(@Param('saleId') saleId: string) {
-    const costs = await this.listSaleCostsUseCase.execute(saleId);
-
-    return { data: costs };
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async findAll(
+    @Param('saleId') saleId: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.listSaleCostsUseCase.execute(saleId, page, limit);
   }
 
   @Patch(':id')

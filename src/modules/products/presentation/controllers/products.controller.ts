@@ -46,18 +46,22 @@ export class ProductsController {
   @ApiQuery({ name: 'categoryId', required: false })
   @ApiQuery({ name: 'supplierId', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
   async findAll(
     @Query('categoryId') categoryId?: string,
     @Query('supplierId') supplierId?: string,
     @Query('search') search?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
   ) {
-    const products = await this.listProductsUseCase.execute({
+    return this.listProductsUseCase.execute({
       categoryId,
       supplierId,
       search,
+      page,
+      limit,
     });
-
-    return { data: products };
   }
 
   @Get(':id')

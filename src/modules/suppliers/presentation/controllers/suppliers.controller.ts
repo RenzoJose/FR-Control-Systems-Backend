@@ -8,8 +8,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { CreateSupplierDto } from '../../application/dto/create-supplier.dto';
 import { UpdateSupplierDto } from '../../application/dto/update-supplier.dto';
@@ -42,10 +43,10 @@ export class SuppliersController {
   @Get()
   @ApiOperation({ summary: 'List suppliers' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Suppliers listed' })
-  async findAll() {
-    const suppliers = await this.listSuppliersUseCase.execute();
-
-    return { data: suppliers };
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
+    return this.listSuppliersUseCase.execute(page, limit);
   }
 
   @Get(':id')

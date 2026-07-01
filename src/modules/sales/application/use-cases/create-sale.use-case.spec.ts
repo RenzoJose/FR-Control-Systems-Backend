@@ -6,6 +6,8 @@ import { PROFITABILITY_REPOSITORY } from '../../../profitability/domain/reposito
 import type { ProfitabilityRepository } from '../../../profitability/domain/repositories/profitability.repository';
 import { ProfitCalculatorService } from '../../../profitability/domain/services/profit-calculator.service';
 import { CreateSaleDto } from '../dto/create-sale.dto';
+import { SaleChannel } from '../../../../shared/enums/sale-channel.enum';
+import { CostType } from '../../../../shared/enums/cost-type.enum';
 
 describe('CreateSaleUseCase', () => {
   let useCase: CreateSaleUseCase;
@@ -17,6 +19,7 @@ describe('CreateSaleUseCase', () => {
       create: jest.fn(),
       findAll: jest.fn(),
       findById: jest.fn(),
+      update: jest.fn(),
     };
 
     profitabilityRepository = {
@@ -44,7 +47,7 @@ describe('CreateSaleUseCase', () => {
 
   it('should create a sale and auto-generate profitability snapshot', async () => {
     const dto: CreateSaleDto = {
-      saleChannel: 'FALABELLA',
+      saleChannel: SaleChannel.FALABELLA,
       saleDate: '2026-06-10',
       items: [
         {
@@ -57,7 +60,7 @@ describe('CreateSaleUseCase', () => {
       ],
       costs: [
         {
-          costType: 'SUPPLIER',
+          costType: CostType.SUPPLIER,
           description: 'Compra fabricante',
           occurredAt: '2026-06-10',
           costGross: 200,
@@ -69,7 +72,7 @@ describe('CreateSaleUseCase', () => {
 
     saleRepository.create.mockResolvedValue({
       id: 'new-sale-id',
-      saleChannel: 'FALABELLA',
+      saleChannel: SaleChannel.FALABELLA,
       saleDate: new Date('2026-06-10'),
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -93,7 +96,7 @@ describe('CreateSaleUseCase', () => {
 
   it('should create a sale without costs and generate snapshot', async () => {
     const dto: CreateSaleDto = {
-      saleChannel: 'DIRECT',
+      saleChannel: SaleChannel.DIRECT,
       saleDate: '2026-06-10',
       items: [
         {
@@ -108,7 +111,7 @@ describe('CreateSaleUseCase', () => {
 
     saleRepository.create.mockResolvedValue({
       id: 'new-sale-id',
-      saleChannel: 'DIRECT',
+      saleChannel: SaleChannel.DIRECT,
       saleDate: new Date('2026-06-10'),
       createdAt: new Date(),
       updatedAt: new Date(),

@@ -31,11 +31,10 @@ export class PrismaProductRepository implements ProductRepository {
     );
   }
 
-  async findAll(filters?: {
-    categoryId?: string;
-    supplierId?: string;
-    search?: string;
-  }): Promise<Product[]> {
+  async findAll(
+    filters?: { categoryId?: string; supplierId?: string; search?: string },
+    pagination?: { skip: number; take: number },
+  ): Promise<{ data: Product[]; total: number }> {
     const where: Record<string, unknown> = {
       deletedAt: null,
     };
@@ -55,22 +54,31 @@ export class PrismaProductRepository implements ProductRepository {
       ];
     }
 
-    const products = await this.prisma.product.findMany({
-      where,
-    });
+    const [products, total] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        where,
+        skip: pagination?.skip,
+        take: pagination?.take,
+        orderBy: { name: 'asc' },
+      }),
+      this.prisma.product.count({ where }),
+    ]);
 
-    return products.map(
-      (p) =>
-        new Product(
-          p.id,
-          p.sku,
-          p.name,
-          p.categoryId,
-          p.supplierId,
-          p.brand ?? undefined,
-          p.deletedAt ?? undefined,
-        ),
-    );
+    return {
+      data: products.map(
+        (p) =>
+          new Product(
+            p.id,
+            p.sku,
+            p.name,
+            p.categoryId,
+            p.supplierId,
+            p.brand ?? undefined,
+            p.deletedAt ?? undefined,
+          ),
+      ),
+      total,
+    };
   }
 
   async findById(id: string): Promise<Product | null> {
